@@ -94,7 +94,7 @@ public:
   * Use vtkm::cont::LogLevel::Off to disable outputing the results via vtkm logging here. The
   * results are saved in the TimingsLogString variable so we can use it to do our own logging
   */
-  vtkm::cont::LogLevel TimingsLogLevel = vtkm::cont::LogLevel::Perf;
+  vtkm::cont::LogLevel TimingsLogLevel = vtkm::cont::LogLevel::Info;
 
   /// Remember the results from our time-keeping so we can customize our logging
   std::string TimingsLogString;
@@ -283,12 +283,14 @@ private:
                   << ": " << timer.GetElapsedTime() << " seconds" << std::endl;
     timer.Start();
 
+    // TODO: replace Stage 4 with ExtremumGraph
     // Stage 4: Identify join saddles & construct Active Join Graph
     MergeTree joinTree(mesh.NumVertices, true);
     ActiveGraph joinGraph(true);
     joinGraph.Initialise(mesh, extrema);
     timingsStream << "    " << std::setw(38) << std::left << "Join Tree Initialize Active Graph"
                   << ": " << timer.GetElapsedTime() << " seconds" << std::endl;
+    joinGraph.SmallPrint("Active Joingraph Instantiated", __FILE__, __LINE__);
 
 #ifdef DEBUG_PRINT
     joinGraph.DebugPrint("Active Graph Instantiated", __FILE__, __LINE__);
@@ -318,6 +320,8 @@ private:
     splitGraph.Initialise(mesh, extrema);
     timingsStream << "    " << std::setw(38) << std::left << "Split Tree Initialize Active Graph"
                   << ": " << timer.GetElapsedTime() << " seconds" << std::endl;
+    splitGraph.SmallPrint("Active Splitgraph Instantiated", __FILE__, __LINE__);
+
 #ifdef DEBUG_PRINT
     splitGraph.DebugPrint("Active Graph Instantiated", __FILE__, __LINE__);
 #endif

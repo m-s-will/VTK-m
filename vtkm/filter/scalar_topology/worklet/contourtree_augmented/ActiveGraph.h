@@ -223,6 +223,7 @@ public:
 
   // prints the contents of the active graph in a standard format
   void DebugPrint(const char* message, const char* fileName, long lineNum);
+  void SmallPrint(const char* message, const char* fileName, long lineNum);
 
 }; // class ActiveGraph
 
@@ -252,6 +253,7 @@ inline void ActiveGraph::Initialise(Mesh& mesh, const MeshExtrema& meshExtrema)
   // Saddle points must be at least outdegree 2, so this is a correct test
   // BUT it is possible to overestimate the degree of a non-extremum,
   // The test is therefore necessary but not sufficient, and extra vertices are put in the active graph
+  // TODO: don't put in saddle candidates, only real saddles
 
   // Neighbourhood mask (one bit set per connected component in neighbourhood
   IdArrayType neighbourhoodMasks;
@@ -914,6 +916,40 @@ inline void ActiveGraph::ReleaseTemporaryArrays()
 
 
 // prints the contents of the active graph in a standard format
+inline void ActiveGraph::SmallPrint(const char* message, const char* fileName, long lineNum)
+{ // DebugPrint()
+  std::cout << "------------------------------------------------------" << std::endl;
+  std::cout << std::setw(30) << std::left << fileName << ":" << std::right << std::setw(4)
+            << lineNum << std::endl;
+  std::cout << std::left << std::string(message) << std::endl;
+  std::cout << "Active Graph Contains:                                " << std::endl;
+  std::cout << "------------------------------------------------------" << std::endl;
+
+  std::cout << "Is Join Graph? " << (this->IsJoinGraph ? "T" : "F") << std::endl;
+  // Full Vertex Arrays
+  std::cout << "Full Vertex Arrays - Size:  " << this->GlobalIndex.GetNumberOfValues() << std::endl;
+  if(this->GlobalIndex.GetNumberOfValues() < 100){
+    PrintHeader(this->GlobalIndex.GetNumberOfValues());
+    PrintIndices("Global Index", this->GlobalIndex);
+    PrintIndices("First Edge", this->FirstEdge);
+    PrintIndices("Outdegree", this->Outdegree);
+    PrintIndices("Hyperarc ID", this->Hyperarcs);
+    PrintIndices("Hypernode ID", this->HyperID);
+    PrintIndices("Supernode ID", this->SuperID);
+    std::cout << std::endl;
+  }
+  // Full Edge Arrays
+  std::cout << "Full Edge Arrays - Size:     " << this->EdgeNear.GetNumberOfValues() << std::endl;
+  if(this->EdgeNear.GetNumberOfValues() < 100){
+    PrintHeader(this->EdgeFar.GetNumberOfValues());
+    PrintIndices("Near", this->EdgeNear);
+    PrintIndices("Far", this->EdgeFar);
+    std::cout << std::endl;
+  }
+  std::cout << "---------------------------" << std::endl;
+  std::cout << std::endl;
+} // SmallPrint()
+
 inline void ActiveGraph::DebugPrint(const char* message, const char* fileName, long lineNum)
 { // DebugPrint()
 #ifdef DEBUG_PRINT
@@ -1006,6 +1042,7 @@ inline void ActiveGraph::DebugPrint(const char* message, const char* fileName, l
   (void)lineNum;
 #endif
 } // DebugPrint()
+
 
 
 
